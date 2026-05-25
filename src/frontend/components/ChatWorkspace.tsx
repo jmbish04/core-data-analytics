@@ -7,14 +7,19 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 
+type VizDatum = { name: string; value: number };
+type VizPayload = { type: "bar" | "line" | "area"; title?: string; data: VizDatum[] };
+type ChatMessage = { id: string; role: string; content: string; metadata?: { visualization?: VizPayload } };
+
 export function ChatWorkspace() {
   const { messages, status, input, handleInputChange, handleSubmit } = useAgentChat({
     agent: "DataAgent",
   });
 
-  const [selectedViz, setSelectedViz] = useState<any>(null);
+  const typedMessages = messages as ChatMessage[];
+  const [selectedViz, setSelectedViz] = useState<VizPayload | null>(null);
 
-  const lastMessageWithViz = [...messages].reverse().find((msg: any) => msg.metadata?.visualization);
+  const lastMessageWithViz = typedMessages.findLast((msg) => msg.metadata?.visualization);
 
   const activeViz = lastMessageWithViz?.metadata?.visualization || selectedViz;
 
@@ -41,7 +46,7 @@ export function ChatWorkspace() {
 
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           <div className="space-y-4 mb-4">
-            {messages.map((msg: any) => (
+            {typedMessages.map((msg) => (
               <div key={msg.id} className={`flex flex-col max-w-[85%] ${msg.role === "user" ? "ml-auto items-end" : "mr-auto items-start"}`}>
                 <div
                   className={`p-3.5 rounded-xl text-sm leading-relaxed border ${

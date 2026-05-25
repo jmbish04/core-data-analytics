@@ -1,16 +1,17 @@
 import { Hono } from "hono";
 import { routeAgentRequest } from "agents";
-import { DataAgent } from "./agent";
+import { DataAgent, type Env } from "./agent";
 
 export { DataAgent };
 
-const app = new Hono<{ Bindings: any }>();
+const workerStartTime = Date.now();
+const app = new Hono<{ Bindings: Env }>();
 
 app.get("/health", (c) => {
   return c.json({
     status: "healthy",
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
+    uptime_ms: Date.now() - workerStartTime,
     services: {
       database: "connected",
       agent_runtime: "active",

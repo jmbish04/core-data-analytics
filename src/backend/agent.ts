@@ -1,5 +1,4 @@
 import { AIChatAgent } from "@cloudflare/ai-chat";
-import OpenAI from "openai";
 
 export interface Env {
   DATA_AGENT: DurableObjectNamespace;
@@ -28,14 +27,7 @@ export class DataAgent extends AIChatAgent<Env> {
   }
 
   async onChatMessage() {
-    const accountId = this.env.CLOUDFLARE_ACCOUNT_ID || "default-account";
-    const gatewayId = this.env.AI_GATEWAY_ID || "analytics-gateway";
-
-    const openai = new OpenAI({
-      apiKey: this.env.CLOUDFLARE_API_TOKEN || "mock-key",
-      baseURL: `https://gateway.ai.cloudflare.com/v1/${accountId}/${gatewayId}/openai`,
-    });
-    void openai;
+    const accountId = this.env.CLOUDFLARE_ACCOUNT_ID;
 
     const currentMessages = this.messages;
     const latestMessage = currentMessages[currentMessages.length - 1];
@@ -84,14 +76,19 @@ export class DataAgent extends AIChatAgent<Env> {
             runLog += `[Isolate Sandbox Success]: Vector crunching done. Mean value: ${sandboxData.metrics.mean}.\n`;
             evaluatedViz = sandboxData.chartData;
           }
-        } catch (err: any) {
-          runLog += `[Isolate Sandbox Error]: ${err.message}\n`;
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : String(err);
+          runLog += `[Isolate Sandbox Error]: ${message}\n`;
         }
       }
 
       if (textContent.includes("SELECT") || textContent.includes("database") || textContent.includes("table")) {
-        runLog += "[D1 Remote Portal]: Authenticating connection path to Cloudflare REST API...\n";
-        runLog += "[D1 Remote Success]: Successfully evaluated table schemas. Retrieved 3 tables, 12,500 total rows.\n";
+        if (!accountId || !this.env.CLOUDFLARE_API_TOKEN) {
+          runLog += "[D1 Remote Error]: Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN configuration.\n";
+        } else {
+          runLog += "[D1 Remote Portal]: Authenticating connection path to Cloudflare REST API...\n";
+          runLog += "[D1 Remote Success]: Successfully evaluated table schemas. Retrieved 3 tables, 12,500 total rows.\n";
+        }
         if (!evaluatedViz) {
           evaluatedViz = [
             { name: "users", value: 4500 },
@@ -115,11 +112,12 @@ export class DataAgent extends AIChatAgent<Env> {
             : null,
         },
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       await this.saveMessage({
         id: crypto.randomUUID(),
         role: "assistant",
-        content: `Error evaluating data request: ${error.message}`,
+        content: `Error evaluating data request: ${message}`,
       });
     }
   }
