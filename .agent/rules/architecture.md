@@ -25,3 +25,11 @@
   2. keeping the shared navigation header on every page,
   3. preserving the dynamic documentation links for `/openapi.json`, `/swagger`, and `/scaler`, and
   4. keeping frontend error flows wired through the centralized error handling utility.
+
+## Cloudflare Edge-Native Full-Stack Architecture Standards
+
+- **Compute Paradigm**: Force all logic into Cloudflare Workers + Hono. No external middleware servers.
+- **Frontend Paradigm**: Utilize Astro for layout structure, routing, and SSR compilation, with interactive sections isolated strictly in React components using `client:load`.
+- **Theme Paradigm**: Enforce default dark theme variables (`bg-zinc-950`, foreground text variables) across components following premium IDE visual signatures.
+- **Stateful Intelligence Logic**: Mandate the Cloudflare Agents SDK over any stateless alternatives. Extend `AIChatAgent` explicitly, mapping real-time state synchronization over hibernated WebSocket sessions.
+- **Untrusted Code Execution**: Leverage the Dynamic Workers API (`worker_loaders`) via `env.LOADER.load()` to process on-the-fly analytical calculation threads inside lightweight isolates.
