@@ -1,0 +1,42 @@
+---
+import { ChatWorkspace } from "../frontend/components/ChatWorkspace";
+import "../styles/globals.css";
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Edge Native Cognitive Data Visualizer Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-zinc-950 text-zinc-50 font-sans antialiased overflow-hidden selection:bg-zinc-800 selection:text-zinc-100">
+    <header class="h-16 border-b border-zinc-800 bg-zinc-950 px-6 flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 rounded-lg bg-white flex items-center justify-center font-bold text-zinc-950 text-sm">Ω</div>
+        <div>
+          <span class="font-bold text-sm tracking-tight text-zinc-100">Analytics Workspace</span>
+          <span class="ml-2 text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-mono border border-zinc-700/60">v2026.5</span>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-6 text-xs font-medium text-zinc-400">
+        <a href="/context" class="hover:text-zinc-200 transition">System Context</a>
+        <a href="/docs" class="hover:text-zinc-200 transition">Interactive Docs</a>
+        <a href="/health" class="hover:text-zinc-200 transition text-emerald-400 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          Cluster Health
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <ChatWorkspace client:load />
+    </main>
+  </body>
+</html>
